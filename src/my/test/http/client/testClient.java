@@ -1,4 +1,4 @@
-package org.wso2.samples;
+package my.test.http.client;
 
 import java.io.BufferedReader;
 import java.io.File;
