@@ -83,7 +83,7 @@ public class testClientWorker implements Runnable
         length = payload.length();
 
         //Create the thread pool
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        ExecutorService executor = Executors.newFixedThreadPool(loop);
         for (int i = 0; i < loop; i++) {
             Runnable worker = new testClientWorker();
             executor.execute(worker);//calling execute method of ExecutorService
