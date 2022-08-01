@@ -33,7 +33,6 @@ public class testClient
     static String payload = "{'hello':'hello'}";
     static String accessToken;
     static int length;
-    static String authorization;
 
     public static void main(String[] args)
     {
