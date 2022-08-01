@@ -1,5 +1,9 @@
-package my.test.http.client;
+package my.test.http.withThreads.client;
 
+
+import java.security.KeyStore;
+import java.util.Properties;
+import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,9 +14,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.security.KeyStore;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -22,7 +25,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-public class testClient
+public class testClientWorker implements Runnable
 {
     static String host;
     static int port;
@@ -34,9 +37,12 @@ public class testClient
     static String accessToken;
     static int length;
 
+    public testClientWorker() {
+    }
+
     public static void main(String[] args)
     {
-       Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
 
         //String path = args[0];
         String path = "/Users/selakapiumal/git/HTTP_client/My_test_client/config_files/config.properties";
@@ -76,18 +82,20 @@ public class testClient
         loop = Integer.parseInt(prop.getProperty("loop"));
         length = payload.length();
 
-        testClient client = new testClient();
+        //Create the thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(5);
         for (int i = 0; i < loop; i++) {
-            System.out.println(i);
-            //client.run() will execute the call
-            client.run();
+            Runnable worker = new testClientWorker();
+            executor.execute(worker);//calling execute method of ExecutorService
         }
+        executor.shutdown();
 
 
     }
 
     public void run()
     {
+        System.out.println(Thread.currentThread().getName()+" (Start) run()");
         SSLContext sslContext = createSSLContext();
         try
         {
@@ -98,10 +106,12 @@ public class testClient
             //handover the sslSocket to the thread
             ClientThread(sslSocket);
         }
+
         catch (Exception ex)
         {
             ex.printStackTrace();
         }
+        System.out.println(Thread.currentThread().getName()+" (End)");
     }
 
     private SSLContext createSSLContext()
